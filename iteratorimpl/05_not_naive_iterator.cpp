@@ -4,7 +4,6 @@
 
 class Array {
 public:
-    template<bool IsConst>
     class iterator {
     public:
         using value_type = int;
