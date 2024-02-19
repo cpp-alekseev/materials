@@ -5,19 +5,19 @@
 class Array {
 public:
     template<bool IsConst>
-    class common_iterator {
+    class iterator {
     public:
         using value_type = int;
-        using pointer = std::conditional_t<IsConst, const int *, int *>;
-        using reference = std::conditional_t<IsConst, const int &, int &>;
+        using pointer = int*;
+        using reference = int &;
 
-        common_iterator() = default;
+        iterator() = default;
 
-        common_iterator(const common_iterator &) = default;
+        iterator(const iterator &) = default;
 
-        common_iterator &operator=(const common_iterator &other) = default;
+        iterator &operator=(const iterator &other) = default;
 
-        auto operator<=>(const common_iterator &) const = default;
+        auto operator<=>(const iterator &) const = default;
 
         reference operator*() const {
             return *ptr;
@@ -31,49 +31,46 @@ public:
             return *(ptr + x);
         }
 
-        ptrdiff_t operator-(const common_iterator &other) const {
+        ptrdiff_t operator-(const iterator &other) const {
             return other.ptr - ptr;
         }
 
-        common_iterator &operator+=(ptrdiff_t x) {
+        iterator &operator+=(ptrdiff_t x) {
             ptr += x;
             return *this;
         }
 
-        common_iterator &operator-=(ptrdiff_t x) {
+        iterator &operator-=(ptrdiff_t x) {
             return operator+=(-1 * x);
         }
 
-        common_iterator &operator++() {
+        iterator &operator++() {
             return operator+=(1);
         }
 
-        common_iterator &operator--() {
+        iterator &operator--() {
             return operator-=(1);
         }
 
-        common_iterator operator++(int) {
+        iterator operator++(int) {
             auto copy = *this;
             operator+=(1);
             return copy;
         }
 
-        common_iterator operator--(int) {
+        iterator operator--(int) {
             auto copy = *this;
             operator-=(1);
             return copy;
         }
 
     private:
-        common_iterator(pointer ptr_) : ptr(ptr_) {}
+        iterator(pointer ptr_) : ptr(ptr_) {}
 
         friend Array;
 
         pointer ptr;
     };
-
-    using iterator = common_iterator<false>;
-    using const_iterator = common_iterator<true>;
 
     explicit Array(int n_) : n(n_) {
         data = new int[n];
@@ -93,20 +90,8 @@ public:
         return {data + n};
     }
 
-    const_iterator cbegin() const {
-        return {data};
-    }
-
-    const_iterator cend() const {
-        return {data + n};
-    }
-
     int &operator[](int i) {
         return data[i];
-    }
-
-    void foo() {
-
     }
 
 private:
@@ -130,11 +115,6 @@ Array::iterator operator-(Array::iterator lhs, ptrdiff_t rhs) {
     return lhs;
 }
 
-template<std::random_access_iterator It>
-void foo(It it) {
-
-}
-
 int main() {
     Array a(5);
     for (int i = 0; i < 5; ++i) {
@@ -145,7 +125,7 @@ int main() {
             std::is_same<
                     std::iterator_traits<Array::iterator>::iterator_category,
                     std::random_access_iterator_tag
-            >::value, "Unexpected common_iterator tag"
+            >::value, "Unexpected iterator tag"
     );
 
     foo(a.begin());
